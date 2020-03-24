@@ -7,7 +7,7 @@ description = "Ultra-lightweight string templating library. No Dependencies"
 repository = "https://github.com/sonro/varj"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
-keywords = ["string template", "parser", "templating", "interpolation", "mustache"]
+keywords = ["template", "parser", "templating", "interpolation", "mustache"]
 categories = ["template-engine"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
