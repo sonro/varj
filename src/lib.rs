@@ -1,5 +1,5 @@
 //! A string interpolation utility to replace
-//! [Mustashe](https://mustache.github.io/) like placeholders with stored variables.
+//! [Mustache](https://mustache.github.io/) like placeholders with stored variables.
 //!
 //!  - Works as an extremely lightweight template library
 //!  - Does not require template compilation
