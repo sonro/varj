@@ -1,4 +1,4 @@
-# varj [![Crates.io](https://img.shields.io/crates/v/varj.svg)](https://crates.io/crates/varj/) [![Documentation](https://docs.rs/varj/badge.svg)](https://docs.rs/varj/)
+# varj ![Build](https://github.com/sonro/varj/workflows/Rust/badge.svg) [![Crates.io](https://img.shields.io/crates/v/varj.svg)](https://crates.io/crates/varj/) [![Documentation](https://docs.rs/varj/badge.svg)](https://docs.rs/varj/)
 
 A string interpolation utility to replace
 [Mustache](https://mustache.github.io/) like placeholders with stored variables.
