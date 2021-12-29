@@ -3,49 +3,45 @@
 A string interpolation utility to replace
 [Mustache](https://mustache.github.io/) like placeholders with stored variables.
 
--   Works as an extremely lightweight template library
--   Does not require template compilation
--   Simply replaces `{{ key }}` with `value`
+- Works as an extremely lightweight template library
+- Does not require template compilation
+- Simply replaces `{{ key }}` with `value`
+- Whitespace surrounding the key is ignored: `{{key}}` and `{{ key }}` are equal.
 
-Interact with this utility via the `parse` function
+Interact with this utility via `VarjMap`.
 
 ## Examples
 
 Basic usage:
 
 ```rust
-use std::collections::HashMap;
+let mut vars = varj::VarjMap::new();
+vars.insert("key", "value");
 
-let mut vars = HashMap::new();
-vars.insert(
-    "key".to_owned(),
-    "value".to_owned()
-);
+let expected = "value";
+let actual = vars.parse("{{ key }}")?;
 
-assert_eq!(
-    "value",
-    varj::parse("{{ key }}", &vars)?
-);
+assert_eq!(expected, actual);
 ```
 
 With a json string:
 
 ```rust
 let mut variables = varj::VarjMap::new();
-variables.insert("name".to_owned(), "Christopher".to_owned());
-variables.insert("age".to_owned(), "30".to_owned());
+variables.insert("name", "Christopher");
+variables.insert("age", "30");
 
 let json = r#"{
-    "name" = "{{ name }}",
-    "age" = {{ age }}
+"name" = "{{ name }}",
+"age" = {{ age }}
 }"#;
 
 let expected = r#"{
-    "name" = "Christopher",
-    "age" = 30
+"name" = "Christopher",
+"age" = 30
 }"#;
 
-let actual = varj::parse(json, &variables)?;
+let actual = variables.parse(json)?;
 
 assert_eq!(expected, actual);
 ```
