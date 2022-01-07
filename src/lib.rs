@@ -61,6 +61,7 @@ use std::collections::HashMap;
 use std::fmt;
 
 /// A map of variables to replace placeholders in a string.
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct VarjMap {
     map: HashMap<String, String>,
 }
@@ -155,8 +156,20 @@ impl VarjMap {
     }
 }
 
+impl From<HashMap<String, String>> for VarjMap {
+    fn from(map: HashMap<String, String>) -> Self {
+        VarjMap { map }
+    }
+}
+
+impl From<VarjMap> for HashMap<String, String> {
+    fn from(map: VarjMap) -> Self {
+        map.map
+    }
+}
+
 /// Unknown key in input string
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Error {
     key: String,
     line: usize,
@@ -439,6 +452,34 @@ mod tests {
                 },
             ],
         );
+    }
+
+    #[test]
+    fn from_hash_map() {
+        let mut hash_map = HashMap::with_capacity(2);
+        hash_map.insert("testKey1".to_string(), "testValue1".to_string());
+        hash_map.insert("testKey2".to_string(), "testValue2".to_string());
+
+        let mut expected = VarjMap::with_capacity(2);
+        expected.insert("testKey1".to_string(), "testValue1".to_string());
+        expected.insert("testKey2".to_string(), "testValue2".to_string());
+
+        let actual = VarjMap::from(hash_map);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn into_hash_map() {
+        let mut varj_map = VarjMap::with_capacity(2);
+        varj_map.insert("testKey1".to_string(), "testValue1".to_string());
+        varj_map.insert("testKey2".to_string(), "testValue2".to_string());
+
+        let mut expected = HashMap::with_capacity(2);
+        expected.insert("testKey1".to_string(), "testValue1".to_string());
+        expected.insert("testKey2".to_string(), "testValue2".to_string());
+
+        let actual = HashMap::from(varj_map);
+        assert_eq!(expected, actual);
     }
 
     fn test_generated_blocks(input: &str, expected: Vec<Block>) {
