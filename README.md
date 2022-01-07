@@ -46,6 +46,9 @@ let actual = variables.parse(json)?;
 assert_eq!(expected, actual);
 ```
 
+`VarjMap` implements `From<[HashMap](https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html)>` and can be converted back to one when needed.
+This is useful if you want to build a `VarjMap` from an iterator, or itererate over one. See [example](./examples/conversion.rs).
+
 ## License
 
 Varj is distributed under the terms of both the MIT license and the

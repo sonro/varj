@@ -55,7 +55,7 @@
 //! #     Ok(())
 //! # }
 //! ```
-#![doc(html_root_url = "https://docs.rs/varj/1.0.0")]
+#![doc(html_root_url = "https://docs.rs/varj/1.0.1")]
 
 use std::collections::HashMap;
 use std::fmt;
