@@ -69,8 +69,16 @@ pub struct VarjMap {
 impl VarjMap {
     /// Create an empty `VarjMap`.
     pub fn new() -> Self {
-        VarjMap {
-            map: HashMap::new(),
+        Self::default()
+    }
+
+    /// Creates an empty `VarjMap` with the specified capacity.
+    ///
+    /// The hash map will be able to hold at least `capacity` elements without
+    /// reallocating. If `capacity` is 0, the hash map will not allocate.
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            map: HashMap::with_capacity(capacity),
         }
     }
 
@@ -139,7 +147,7 @@ impl VarjMap {
             idx = block.start;
 
             // copy variable_value
-            if let Some(value) = block.value_from_map(&self) {
+            if let Some(value) = block.value_from_map(self) {
                 output.push_str(value);
             } else {
                 return Err(Error::from(block));
@@ -241,7 +249,7 @@ fn generate_blocks(input: &str) -> Vec<Block> {
                         len: next_idx - idx_start + 1,
                         line: line_start,
                         col: col_start,
-                        variable_key: &input[idx_start + 2..next_idx - 1].trim(),
+                        variable_key: input[idx_start + 2..next_idx - 1].trim(),
                     });
 
                     // end of block
