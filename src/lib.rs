@@ -289,7 +289,7 @@ mod tests {
         test_parse_vars(
             "testKey: testValue;",
             "testKey: {{ testKey }};",
-            vec![("testKey", "testValue")],
+            &[("testKey", "testValue")],
         );
     }
 
@@ -298,7 +298,7 @@ mod tests {
         test_parse_vars(
             "testKey: testValue; testKey2: testValue2;",
             "testKey: {{testKey}}; testKey2: {{ testKey2 }};",
-            vec![("testKey", "testValue"), ("testKey2", "testValue2")],
+            &[("testKey", "testValue"), ("testKey2", "testValue2")],
         );
     }
 
@@ -307,7 +307,7 @@ mod tests {
         test_parse_vars(
             "testKey: testValue; testKey2: testValue2;",
             "testKey: testValue; testKey2: testValue2;",
-            vec![],
+            &[],
         );
     }
 
@@ -335,15 +335,6 @@ mod tests {
         );
         let actual_error_msg = format!("{}", actual);
         assert_eq!(expected_error_msg, actual_error_msg);
-    }
-
-    fn test_parse_vars(expected: &str, input: &str, vars: Vec<(&str, &str)>) {
-        let mut map = VarjMap::new();
-        for (k, v) in vars {
-            map.insert(k, v);
-        }
-        let actual = map.parse(input).expect("parsing should succeed");
-        assert_eq!(expected, actual);
     }
 
     #[test]
@@ -464,29 +455,24 @@ mod tests {
 
     #[test]
     fn from_hash_map() {
-        let mut hash_map = HashMap::with_capacity(2);
-        hash_map.insert("testKey1".to_string(), "testValue1".to_string());
-        hash_map.insert("testKey2".to_string(), "testValue2".to_string());
-
-        let mut expected = VarjMap::with_capacity(2);
-        expected.insert("testKey1".to_string(), "testValue1".to_string());
-        expected.insert("testKey2".to_string(), "testValue2".to_string());
-
+        let (expected, hash_map) = matching_varj_and_hash_maps();
         let actual = VarjMap::from(hash_map);
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn into_hash_map() {
-        let mut varj_map = VarjMap::with_capacity(2);
-        varj_map.insert("testKey1".to_string(), "testValue1".to_string());
-        varj_map.insert("testKey2".to_string(), "testValue2".to_string());
-
-        let mut expected = HashMap::with_capacity(2);
-        expected.insert("testKey1".to_string(), "testValue1".to_string());
-        expected.insert("testKey2".to_string(), "testValue2".to_string());
-
+        let (varj_map, expected) = matching_varj_and_hash_maps();
         let actual = HashMap::from(varj_map);
+        assert_eq!(expected, actual);
+    }
+
+    fn test_parse_vars(expected: &str, input: &str, vars: &[(&str, &str)]) {
+        let mut map = VarjMap::new();
+        for (k, v) in vars {
+            map.insert(*k, *v);
+        }
+        let actual = map.parse(input).expect("parsing should succeed");
         assert_eq!(expected, actual);
     }
 
@@ -495,5 +481,23 @@ mod tests {
         for (idx, _block) in actual.iter().enumerate() {
             assert_eq!(expected[idx], actual[idx]);
         }
+    }
+
+    fn matching_varj_and_hash_maps() -> (VarjMap, HashMap<String, String>) {
+        let key1 = "testKey1";
+        let value1 = "testValue1";
+
+        let key2 = "testKey2";
+        let value2 = "testValue2";
+
+        let mut hash_map = HashMap::with_capacity(2);
+        hash_map.insert(key1.to_string(), value1.to_string());
+        hash_map.insert(key2.to_string(), value2.to_string());
+
+        let mut varj_map = VarjMap::with_capacity(2);
+        varj_map.insert(key1, value1);
+        varj_map.insert(key2, value2);
+
+        (varj_map, hash_map)
     }
 }
