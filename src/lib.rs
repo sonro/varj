@@ -56,16 +56,19 @@
 //! # }
 //! ```
 
+use std::borrow::{Borrow, Cow};
 use std::collections::HashMap;
 use std::fmt;
 
+pub type CowHashMap<'a> = HashMap<Cow<'a, str>, Cow<'a, str>>;
+
 /// A map of variables to replace placeholders in a string.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
-pub struct VarjMap {
-    map: HashMap<String, String>,
+pub struct VarjMap<'a> {
+    map: CowHashMap<'a>,
 }
 
-impl VarjMap {
+impl<'a> VarjMap<'a> {
     /// Create an empty `VarjMap`.
     pub fn new() -> Self {
         Self::default()
@@ -83,18 +86,19 @@ impl VarjMap {
 
     /// Insert a key value pair into the `VarjMap`.
     ///
-    /// Use any type so long as it can be converted into a string.
+    /// Use any type so long as it can be converted into a
+    /// [`Cow<'a, str>`](std::borrow::Cow).
     pub fn insert<K, V>(&mut self, key: K, value: V)
     where
-        K: Into<String>,
-        V: Into<String>,
+        K: Into<Cow<'a, str>>,
+        V: Into<Cow<'a, str>>,
     {
         self.map.insert(key.into(), value.into());
     }
 
     /// Get a value from the `VarjMap` by key.
     pub fn get<K: AsRef<str>>(&self, key: K) -> Option<&str> {
-        self.map.get(key.as_ref()).map(|s| s.as_str())
+        self.map.get(key.as_ref()).map(Cow::borrow)
     }
 
     /// Render a template with its placeholder blocks replaced by set values.
@@ -169,14 +173,29 @@ impl VarjMap {
     }
 }
 
-impl From<HashMap<String, String>> for VarjMap {
-    fn from(map: HashMap<String, String>) -> Self {
-        VarjMap { map }
+impl<'a, K, V> From<HashMap<K, V>> for VarjMap<'a>
+where
+    K: Into<Cow<'a, str>>,
+    V: Into<Cow<'a, str>>,
+{
+    fn from(map: HashMap<K, V>) -> Self {
+        VarjMap {
+            map: map.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+        }
     }
 }
 
-impl From<VarjMap> for HashMap<String, String> {
+impl<'a> From<VarjMap<'a>> for HashMap<String, String> {
     fn from(map: VarjMap) -> Self {
+        map.map
+            .into_iter()
+            .map(|(k, v)| (k.into(), v.into()))
+            .collect()
+    }
+}
+
+impl<'a> From<VarjMap<'a>> for CowHashMap<'a> {
+    fn from(map: VarjMap<'a>) -> Self {
         map.map
     }
 }
@@ -491,7 +510,7 @@ mod tests {
         }
     }
 
-    fn matching_varj_and_hash_maps() -> (VarjMap, HashMap<String, String>) {
+    fn matching_varj_and_hash_maps<'a>() -> (VarjMap<'a>, HashMap<String, String>) {
         let key1 = "testKey1";
         let value1 = "testValue1";
 
