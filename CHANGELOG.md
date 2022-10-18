@@ -8,6 +8,21 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+#### [**BREAKING**] `VarjMap::insert` parameter types
+
+`VarjMap::insert` now takes keys and values that implement `Into<Cow<'a, str>>`
+instead of `Into<String>`. This means it doesn't allocate a `String` if the key
+and/or value outlives the `VarjMap`.
+
+##### Migration
+
+For the majority of cases this wont cause a break: any caller that passes in an
+`&str` or `String` directly will continue to work. However, if the argument's
+type is limited to the same constraint as the old API (`Into<String>`), then the
+caller must change it's invocation of `VarjMap::insert`.
+
 ## [1.1.0] 2022-10-28
 
 ### Changed
