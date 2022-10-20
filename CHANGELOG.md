@@ -8,6 +8,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.3] 2022-10-20
+
 ### Documentation
 
 - Fix rustdoc links.
@@ -46,7 +48,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - `parse` function to interpolate `VarjMap` values into a mustache-like
   template.
 
-[Unreleased]: https://github.com/sonro/varj/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/sonro/varj/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/sonro/varj/releases/tag/v1.0.3
 [1.0.2]: https://github.com/sonro/varj/releases/tag/v1.0.2
 [1.0.1]: https://github.com/sonro/varj/releases/tag/v1.0.1
 [1.0.0]: https://github.com/sonro/varj/releases/tag/v1.0.0
