@@ -6,7 +6,7 @@
 //!  - Simply replaces `{{ key }}` with `value`
 //!  - Whitespace surrounding the key is ignored: `{{key}}` and `{{ key }}` are equal.
 //!
-//! Interact with this utility via [`VarjMap`](struct.VarjMap.html)
+//! Interact with this utility via [`VarjMap`]
 //!
 //! # Examples
 //!
@@ -55,7 +55,6 @@
 //! #     Ok(())
 //! # }
 //! ```
-#![doc(html_root_url = "https://docs.rs/varj/1.0.2")]
 
 use std::collections::HashMap;
 use std::fmt;
