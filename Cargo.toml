@@ -9,7 +9,4 @@ readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["template", "parser", "templating", "interpolation", "mustache"]
 categories = ["template-engine"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+metadata = { msrv = "1.56.1" }
