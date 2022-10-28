@@ -166,11 +166,6 @@ impl<'a> VarjMap<'a> {
 
         Ok(output)
     }
-
-    #[deprecated(since = "1.1.0", note = "please use `render` instead")]
-    pub fn parse(&self, template: &str) -> Result<String, Error> {
-        self.render(template)
-    }
 }
 
 impl<'a, K, V> From<HashMap<K, V>> for VarjMap<'a>
@@ -497,9 +492,6 @@ mod tests {
             map.insert(*k, *v);
         }
         let actual = map.render(template).expect("rendering should succeed");
-        assert_eq!(expected, actual);
-        #[allow(deprecated)]
-        let actual = map.parse(template).expect("rendering should succeed");
         assert_eq!(expected, actual);
     }
 

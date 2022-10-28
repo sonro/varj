@@ -29,6 +29,15 @@ For the majority of cases this wont cause a break: any caller that passes in an
 type is limited to the same constraint as the old API (`Into<String>`), then the
 caller must change it's invocation of `VarjMap::insert`.
 
+#### [**BREAKING**] `VarjMap::parse` removed
+
+`parse` function has been renamed to `render`. Previously deprecated `parse` has
+now been removed.
+
+##### Migration
+
+Change all instances of `VarjMap::parse` to `VarjMap::render`.
+
 ## [1.1.0] 2022-10-28
 
 ### Changed
