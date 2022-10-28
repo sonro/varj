@@ -13,7 +13,7 @@ fn replace_single_variable() {
         "name" = "TestName"
     }"#;
 
-    test_parse(json, map, expected);
+    test_render(json, map, expected);
 }
 
 #[test]
@@ -32,10 +32,10 @@ fn replace_multiple_variables() {
         "age" = 30
     }"#;
 
-    test_parse(json, map, expected);
+    test_render(json, map, expected);
 }
 
-fn test_parse(json_template: &str, map: VarjMap, expected: &str) {
-    let actual = map.parse(json_template).expect("parsing should succeed");
+fn test_render(template: &str, map: VarjMap, expected: &str) {
+    let actual = map.render(template).expect("rendering should succeed");
     assert_eq!(expected, actual);
 }

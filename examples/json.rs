@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     "age" = 30
 }"#;
 
-    let actual = variables.parse(json)?;
+    let actual = variables.render(json)?;
 
     assert_eq!(expected, actual);
     Ok(())

@@ -23,11 +23,11 @@ Interact with this utility via
 Basic usage:
 
 ```rust
-let mut vars = varj::VarjMap::new();
-vars.insert("key", "value");
+let mut map = varj::VarjMap::new();
+map.insert("key", "value");
 
 let expected = "value";
-let actual = vars.parse("{{ key }}")?;
+let actual = map.render("{{ key }}")?;
 
 assert_eq!(expected, actual);
 ```
@@ -49,7 +49,7 @@ let expected = r#"{
 "age" = 30
 }"#;
 
-let actual = variables.parse(json)?;
+let actual = variables.render(json)?;
 
 assert_eq!(expected, actual);
 ```

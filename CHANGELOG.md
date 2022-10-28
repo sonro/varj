@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Rename `VarjMap` method `parse` to `render`. Keep a deprecated `parse` method.
+
 ## [1.0.3] 2022-10-20
 
 ### Documentation

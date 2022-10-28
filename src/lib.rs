@@ -16,12 +16,12 @@
 //! # use std::error::Error;
 //! #
 //! # fn main() -> Result<(), Box<dyn Error>> {
-//! let mut vars = varj::VarjMap::new();
-//! vars.insert("key", "value");
+//! let mut map = varj::VarjMap::new();
+//! map.insert("key", "value");
 //!
 //! assert_eq!(
 //!     "value",
-//!     vars.parse("{{ key }}")?
+//!     map.render("{{ key }}")?
 //! );
 //! #
 //! #     Ok(())
@@ -48,7 +48,7 @@
 //!     "age" = 30
 //! }"#;
 //!
-//! let actual = variables.parse(json)?;
+//! let actual = variables.render(json)?;
 //!
 //! assert_eq!(expected, actual);
 //! #
@@ -97,17 +97,18 @@ impl VarjMap {
         self.map.get(key.as_ref()).map(|s| s.as_str())
     }
 
-    /// Parse the input for VarjBlocks `{{ key }}` and replace with value
+    /// Render a template with its placeholder blocks replaced by set values.
     ///
-    /// If no VarjBlocks are present in the input string, it is merely cloned.
+    /// If no placeholder blocks(`{{ key }}`) are present in the template,
+    /// returns a cloned [`String`].
     ///
-    /// Whitespace surrounding the key is ignored:
-    /// `{{key}}` and `{{ key }}` are equal.
+    /// Whitespace surrounding the key is ignored: `{{key}}` and `{{ key }}` are
+    /// equal.
     ///
     /// # Errors
     ///
-    /// Will return an error if the input string contains a key that is not
-    /// provided.
+    /// Will return an [`Error`] if the template contains a key that is not
+    /// set.
     ///
     /// # Example
     ///
@@ -127,22 +128,22 @@ impl VarjMap {
     ///
     /// // test result
     /// let expected = "name: Christopher";
-    /// let actual = map.parse(input)?;
+    /// let actual = map.render(input)?;
     ///
     /// assert_eq!(expected, actual);
     /// #
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn parse(&self, input: &str) -> Result<String, Error> {
-        let blocks = generate_blocks(input);
+    pub fn render(&self, template: &str) -> Result<String, Error> {
+        let blocks = parse_blocks(template);
 
-        let mut output = String::with_capacity(input.len() + 32);
+        let mut output = String::with_capacity(template.len() + 32);
         let mut idx = 0;
 
         for block in blocks {
             // copy input until block
-            output.push_str(&input[idx..block.start]);
+            output.push_str(&template[idx..block.start]);
             idx = block.start;
 
             // copy variable_value
@@ -157,9 +158,14 @@ impl VarjMap {
         }
 
         // copy remaining input
-        output.push_str(&input[idx..input.len()]);
+        output.push_str(&template[idx..template.len()]);
 
         Ok(output)
+    }
+
+    #[deprecated(since = "1.1.0", note = "please use `render` instead")]
+    pub fn parse(&self, template: &str) -> Result<String, Error> {
+        self.render(template)
     }
 }
 
@@ -220,7 +226,7 @@ impl<'a> Block<'a> {
     }
 }
 
-fn generate_blocks(input: &str) -> Vec<Block> {
+fn parse_blocks(template: &str) -> Vec<Block> {
     let mut blocks = Vec::new();
 
     let mut in_block = false;
@@ -230,7 +236,7 @@ fn generate_blocks(input: &str) -> Vec<Block> {
     let mut col = 0;
     let mut col_start = 0;
 
-    let mut chars = input.char_indices().peekable();
+    let mut chars = template.char_indices().peekable();
 
     while let Some((idx, ch)) = chars.next() {
         col += 1;
@@ -248,7 +254,7 @@ fn generate_blocks(input: &str) -> Vec<Block> {
                         len: next_idx - idx_start + 1,
                         line: line_start,
                         col: col_start,
-                        variable_key: input[idx_start + 2..next_idx - 1].trim(),
+                        variable_key: template[idx_start + 2..next_idx - 1].trim(),
                     });
 
                     // end of block
@@ -284,8 +290,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_single_var() {
-        test_parse_vars(
+    fn render_single_var() {
+        test_render_vars(
             "testKey: testValue;",
             "testKey: {{ testKey }};",
             &[("testKey", "testValue")],
@@ -293,8 +299,8 @@ mod tests {
     }
 
     #[test]
-    fn parse_multiple_vars() {
-        test_parse_vars(
+    fn render_multiple_vars() {
+        test_render_vars(
             "testKey: testValue; testKey2: testValue2;",
             "testKey: {{testKey}}; testKey2: {{ testKey2 }};",
             &[("testKey", "testValue"), ("testKey2", "testValue2")],
@@ -302,8 +308,8 @@ mod tests {
     }
 
     #[test]
-    fn parse_without_vars() {
-        test_parse_vars(
+    fn render_without_vars() {
+        test_render_vars(
             "testKey: testValue; testKey2: testValue2;",
             "testKey: testValue; testKey2: testValue2;",
             &[],
@@ -311,7 +317,7 @@ mod tests {
     }
 
     #[test]
-    fn parse_incorrect_vars() {
+    fn render_incorrect_vars() {
         let input = "testKey: {{testKey}}; testValue2: {{ wrongKey }};";
         let mut map = VarjMap::new();
         map.insert("testKey", "testValue");
@@ -323,7 +329,7 @@ mod tests {
             key: "wrongKey".to_owned(),
         };
 
-        let actual = map.parse(input).expect_err("parsing should error");
+        let actual = map.render(input).expect_err("parsing should error");
         assert_eq!(expected.line, actual.line);
         assert_eq!(expected.col, actual.col);
         assert_eq!(expected.key, actual.key);
@@ -337,8 +343,8 @@ mod tests {
     }
 
     #[test]
-    fn generate_single_block_with_whitespace() {
-        test_generated_blocks(
+    fn parse_single_block_with_whitespace() {
+        test_parsed_blocks(
             "testKey: {{ testKey }};",
             vec![Block {
                 start: 9,
@@ -351,8 +357,8 @@ mod tests {
     }
 
     #[test]
-    fn generate_single_block_without_whitespace() {
-        test_generated_blocks(
+    fn parse_single_block_without_whitespace() {
+        test_parsed_blocks(
             "testKey: {{testKey}};",
             vec![Block {
                 start: 9,
@@ -365,8 +371,8 @@ mod tests {
     }
 
     #[test]
-    fn generate_single_block_at_start() {
-        test_generated_blocks(
+    fn parse_single_block_at_start() {
+        test_parsed_blocks(
             "{{testKey}}: testKey",
             vec![Block {
                 start: 0,
@@ -379,8 +385,8 @@ mod tests {
     }
 
     #[test]
-    fn generate_single_block_at_len() {
-        test_generated_blocks(
+    fn parse_single_block_at_len() {
+        test_parsed_blocks(
             "testKey: {{testKey}}",
             vec![Block {
                 start: 9,
@@ -393,8 +399,8 @@ mod tests {
     }
 
     #[test]
-    fn generate_single_block_with_added_braces() {
-        test_generated_blocks(
+    fn parse_single_block_with_added_braces() {
+        test_parsed_blocks(
             "test{Key: {{ test}Key }};",
             vec![Block {
                 start: 10,
@@ -407,8 +413,8 @@ mod tests {
     }
 
     #[test]
-    fn generate_multiple_blocks() {
-        test_generated_blocks(
+    fn parse_multiple_blocks() {
+        test_parsed_blocks(
             "testKey: {{testKey}}; testKey2: {{ testKey2 }};",
             vec![
                 Block {
@@ -430,8 +436,8 @@ mod tests {
     }
 
     #[test]
-    fn generate_multiple_blocks_on_multiple_lines() {
-        test_generated_blocks(
+    fn parse_multiple_blocks_on_multiple_lines() {
+        test_parsed_blocks(
             "testKey: {{testKey}};\ntestKey2: {{ testKey2 }};",
             vec![
                 Block {
@@ -466,17 +472,20 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
-    fn test_parse_vars(expected: &str, input: &str, vars: &[(&str, &str)]) {
+    fn test_render_vars(expected: &str, template: &str, vars: &[(&str, &str)]) {
         let mut map = VarjMap::new();
         for (k, v) in vars {
             map.insert(*k, *v);
         }
-        let actual = map.parse(input).expect("parsing should succeed");
+        let actual = map.render(template).expect("rendering should succeed");
+        assert_eq!(expected, actual);
+        #[allow(deprecated)]
+        let actual = map.parse(template).expect("rendering should succeed");
         assert_eq!(expected, actual);
     }
 
-    fn test_generated_blocks(input: &str, expected: Vec<Block>) {
-        let actual = generate_blocks(input);
+    fn test_parsed_blocks(input: &str, expected: Vec<Block>) {
+        let actual = parse_blocks(input);
         for (idx, _block) in actual.iter().enumerate() {
             assert_eq!(expected[idx], actual[idx]);
         }

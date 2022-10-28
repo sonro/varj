@@ -14,9 +14,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     // convert the HashMap into a VarjMap
     let map = VarjMap::from(hash_map);
 
-    // use it to parse a template
+    // use it to render a template
     let expected = "value1";
-    let actual = map.parse("{{ key1 }}")?;
+    let actual = map.render("{{ key1 }}")?;
     assert_eq!(expected, actual);
 
     // convert it back into a HashMap

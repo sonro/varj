@@ -6,7 +6,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     map.insert("key", "value");
 
     let expected = "value";
-    let actual = map.parse("{{ key }}")?;
+    let actual = map.render("{{ key }}")?;
 
     assert_eq!(expected, actual);
     Ok(())
