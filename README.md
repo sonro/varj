@@ -58,6 +58,14 @@ assert_eq!(expected, actual);
 needed.  This is useful if you want to build a `VarjMap` from an iterator,
 or iterate over one. See [example](./examples/conversion.rs).
 
+## MSRV Policy
+
+The minimum supported Rust version is currently
+[1.56.1](https://github.com/rust-lang/rust/releases/tag/1.56.1).
+
+varj supports the latest 8 stable releases of Rust - approximately 1 year.
+Increasing MSRV is *not* considered a semver-breaking change.
+
 ## Contributing
 
 **Thank you very much for considering to contribute to this project!**
