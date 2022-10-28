@@ -1,6 +1,6 @@
 [package]
 name = "varj"
-version = "1.0.3"
+version = "1.1.0"
 authors = ["sonro <sonro@gmx.com>"]
 edition = "2021"
 description = "Ultra-lightweight string templating library. No Dependencies"
