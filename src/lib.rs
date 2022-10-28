@@ -123,12 +123,12 @@ impl VarjMap {
     /// let value = "Christopher";
     /// map.insert(key, value);
     ///
-    /// // string input to parse
-    /// let input = "name: {{name}}";
+    /// // template to render
+    /// let template = "name: {{name}}";
     ///
     /// // test result
     /// let expected = "name: Christopher";
-    /// let actual = map.render(input)?;
+    /// let actual = map.render(template)?;
     ///
     /// assert_eq!(expected, actual);
     /// #
