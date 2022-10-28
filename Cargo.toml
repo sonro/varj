@@ -9,4 +9,4 @@ readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["template", "parser", "templating", "interpolation", "mustache"]
 categories = ["template-engine"]
-metadata = { msrv = "1.56.1" }
+rust-version = "1.56.1"
