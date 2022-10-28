@@ -8,6 +8,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- [**BREAKING**] `rust_version` key in cargo package. The Minimum Supported Rust Version has
+  been a part of the documentation until this point, but this addition could
+  break builds of `varj`.
+
 ### Changed
 
 #### [**BREAKING**] `VarjMap::insert` parameter types
