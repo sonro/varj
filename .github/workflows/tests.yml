@@ -83,3 +83,29 @@ jobs:
           command: clippy
           args: --all --tests --examples -- -D warnings
 
+  codecov:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Check coverage
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: 0.22.0
+          args: --ignore-tests --workspace -- --test-threads 1
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code_coverage_result
+          path: cobertura.xml
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v3
+        with:
+          files: cobertura.xml

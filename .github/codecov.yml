@@ -1,0 +1,8 @@
+comment:
+  layout: "header, diff ,files"
+  behavior: new
+
+coverage:
+  status:
+    project: off
+    patch: off
