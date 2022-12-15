@@ -15,16 +15,18 @@ first.
 
 Our continuous integration workflow checks all pull requests to ensure:
 
-- All tests pass on stable and Rust 1.32.0
+- All tests pass on stable and [MSRV]
 - No [clippy](https://github.com/rust-lang/rust-clippy) errors or warnings
 - [Rustfmt](https://github.com/rust-lang/rustfmt) is adhered to
+- [Rustdoc](https://doc.rust-lang.org/rustdoc/write-documentation/linking-to-items-by-name.html)
+  links work.
 
-To check this on your own machine run `cargo test`, `cargo clippy`, and `cargo
-fmt --check`.
+To check this on your own machine run `cargo test`, `cargo clippy`,
+`cargo doc` and `cargo fmt --check`.
 
 ### MSRV
 
-The current minimum supported Rust version of this project is 1.32.0. If your
+The current minimum supported Rust version of this project is [1.56.1][MSRV]. If your
 change requires a newer version we are open to upgrading.
 
 ## Commit messages
@@ -61,3 +63,5 @@ Entries follow this format:
 
 Here, `#123` is the number of the original issue and/or your pull request.
 Please replace `@user` by your GitHub username.
+
+[MSRV] https://github.com/rust-lang/rust/releases/tag/1.56.1
