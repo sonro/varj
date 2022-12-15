@@ -26,7 +26,7 @@ To check this on your own machine run `cargo test`, `cargo clippy`,
 
 ### MSRV
 
-The current minimum supported Rust version of this project is [1.56.1][MSRV]. If your
+Please see the [readme][MSRV] for the current minimum supported rust version. If your
 change requires a newer version we are open to upgrading.
 
 ## Commit messages
@@ -64,4 +64,4 @@ Entries follow this format:
 Here, `#123` is the number of the original issue and/or your pull request.
 Please replace `@user` by your GitHub username.
 
-[MSRV] https://github.com/rust-lang/rust/releases/tag/1.56.1
+[MSRV]: README.md#msrv-policy
