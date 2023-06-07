@@ -3,7 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/varj.svg)](https://crates.io/crates/varj)
 [![msrv
 1.56.1](https://img.shields.io/badge/msrv-1.56.1-dea584.svg?logo=rust)](https://github.com/rust-lang/rust/releases/tag/1.56.1)
-[![tests](https://img.shields.io/github/workflow/status/sonro/varj/release?label=tests&logo=github)](https://github.com/sonro/varj/actions/workflows/tests.yml)
+[![tests](https://img.shields.io/github/actions/workflow/status/sonro/varj/tests.yml?label=tests&logo=github)](https://github.com/sonro/varj/actions/workflows/tests.yml)
 [![Documentation](https://img.shields.io/docsrs/varj?logo=docs.rs)](https://docs.rs/varj/)
 [![license](https://img.shields.io/crates/l/varj.svg)](#license)
 
