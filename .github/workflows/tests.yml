@@ -4,15 +4,20 @@ on:
   push:
     branches:
       - 'master'
+      - 'ci'
 
   pull_request:
     branches:
       - 'master'
       - 'dev'
 
+env:
+  RUST_BACKTRACE: 1
+
 jobs:
   tests:
     strategy:
+      fail-fast: false
       matrix:
         # minimum supported rust version
         rust: [1.56.1, stable]
@@ -20,114 +25,93 @@ jobs:
           - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
           - { os: macos-latest, target: x86_64-apple-darwin }
           - { os: windows-latest, target: x86_64-pc-windows-msvc }
-        include:
-          - use-cross: false
 
     runs-on: ${{ matrix.on.os }}
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.on.target }}
-          override: true
+
+      - name: Generate lockfile
+        if: hashFiles('Cargo.lock') == ''
+        run: cargo generate-lockfile
 
       - name: Build tests
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: ${{ matrix.use-cross }}
-          command: test
-          args: --no-run --target ${{ matrix.on.target }}
+        run: cargo test --no-run --locked --all-features
 
       - name: Run tests
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: ${{ matrix.use-cross }}
-          command: test
-          args: --target ${{ matrix.on.target }}
-
-  rustfmt:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          profile: minimal
-          components: rustfmt
-
-      - name: Run rustfmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: -- --check
+        run: cargo test --locked --all-features
 
   docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install minimal toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          profile: minimal
+      - name: Install nightly
+        uses: dtolnay/rust-toolchain@nightly
 
-      - name: Run rustdoc
+      - name: cargo doc
+        run: cargo doc --no-deps --all-features --document-private-items
         env:
-          RUSTDOCFLAGS: -D warnings
-        uses: actions-rs/cargo@v1
+          RUSTDOCFLAGS: --cfg docsrs -D warnings
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@stable
         with:
-          command: doc
-          args: --no-deps --document-private-items
+          components: rustfmt
 
-
+      - name: Run rustfmt
+        run: cargo fmt -- --check
 
   clippy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions-rs/toolchain@v1
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
-          profile: minimal
           components: clippy
 
       - name: Run clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --all --tests --examples -- -D warnings
+        run: cargo clippy --all --examples --tests -- -D warnings
 
-  codecov:
+  coverage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions-rs/toolchain@v1
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
+          components: llvm-tools-preview
 
-      - name: Check coverage
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: 0.22.0
-          args: --ignore-tests --workspace -- --test-threads 1
+      - name: cargo install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: cargo generate-lockfile
+        if: hashFiles('Cargo.lock') == ''
+        run: cargo generate-lockfile
+
+      - name: llvm-cov
+        run: cargo llvm-cov --locked --all-features --lcov --output-path lcov.info
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
         with:
           name: code_coverage_result
-          path: cobertura.xml
+          path: lcov.info
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v3
         with:
-          files: cobertura.xml
+          files: lcov.info
+          fail_ci_if_error: true

@@ -1,5 +1,5 @@
 comment:
-  layout: "header, diff ,files"
+  layout: "header, diff, files"
   behavior: new
 
 coverage:

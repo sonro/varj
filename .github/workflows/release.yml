@@ -19,11 +19,11 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
 
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@stable
+
       - name: cargo publish
-        uses: actions-rs/cargo@v1
-        with:
-          command: publish
-          args: --token ${{ secrets.CRATES_TOKEN }}
+        run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
 
   create-release:
     needs: publish
