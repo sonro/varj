@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Minimum supported rust version now 1.71.1
+
 ## [1.1.0] 2022-10-28
 
 ### Changed
