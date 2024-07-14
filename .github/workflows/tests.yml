@@ -3,13 +3,13 @@ name: tests
 on:
   push:
     branches:
-      - 'master'
-      - 'ci'
+      - "master"
+      - "ci"
 
   pull_request:
     branches:
-      - 'master'
-      - 'dev'
+      - "master"
+      - "dev"
 
 env:
   RUST_BACKTRACE: 1
@@ -21,34 +21,30 @@ jobs:
       matrix:
         # minimum supported rust version
         rust: [1.56.1, stable]
-        on: 
+        on:
           - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
           - { os: macos-latest, target: x86_64-apple-darwin }
           - { os: windows-latest, target: x86_64-pc-windows-msvc }
 
     runs-on: ${{ matrix.on.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.on.target }}
 
-      - name: Generate lockfile
-        if: hashFiles('Cargo.lock') == ''
-        run: cargo generate-lockfile
-
       - name: Build tests
-        run: cargo test --no-run --locked --all-features
+        run: cargo test --no-run --all-features
 
       - name: Run tests
-        run: cargo test --locked --all-features
+        run: cargo test --all-features
 
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install nightly
         uses: dtolnay/rust-toolchain@nightly
@@ -61,7 +57,7 @@ jobs:
   rustfmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install stable
         uses: dtolnay/rust-toolchain@stable
@@ -74,7 +70,7 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install stable
         uses: dtolnay/rust-toolchain@stable
@@ -87,7 +83,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install stable
         uses: dtolnay/rust-toolchain@stable
@@ -97,21 +93,20 @@ jobs:
       - name: cargo install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
 
-      - name: cargo generate-lockfile
-        if: hashFiles('Cargo.lock') == ''
-        run: cargo generate-lockfile
-
       - name: llvm-cov
-        run: cargo llvm-cov --locked --all-features --lcov --output-path lcov.info
+        run: cargo llvm-cov --all-features --lcov --output-path lcov.info
 
       - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: code_coverage_result
           path: lcov.info
 
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: lcov.info
-          fail_ci_if_error: true
+          fail_ci_if_error: false
+
